@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(description="Getting File Information")
 parser.add_argument("-cmd", action="store_true")
 args = parser.parse_args()
 
-HOME = os.getcwd() + "/"
+HOME = os.getcwd()
 
 CURSOR_UP_ONE = '\x1b[1A'
 ERASE_LINE = '\x1b[2K'
@@ -134,7 +134,7 @@ class Pipeline:
         print("Current Directory --> \033[34;1;4m"+ str(self.current_dir) + "\033[0m")
         self.fileOverflow = False
         for file in self.allFiles:
-            if os.path.isdir(self.current_dir + "/" + file):
+            if os.path.isdir(os.path.join(self.current_dir, file)):
                 print(" \033[31;1;4m" + file + "\033[0m")
             else:
                 print(" -- \033[1;32m" + file + "\033[0m")
@@ -174,7 +174,7 @@ class Pipeline:
                     sys.stdout.write(CURSOR_UP_ONE)
                     sys.stdout.write(ERASE_LINE)
 
-                    if os.path.isdir(self.current_dir + "/" + self.allFiles[self.currentFileIndex+1]):
+                    if os.path.isdir(os.path.join(self.current_dir,self.allFiles[self.currentFileIndex+1])):
                         print(" \033[31;1;4m" + self.allFiles[self.currentFileIndex+1] + "\033[0m")
                     else:
                         print(" -- \033[1;32m" + self.allFiles[self.currentFileIndex+1] + "\033[0m")
@@ -661,8 +661,8 @@ class qualityChecker:
 
         if not nii:
             self.img = Dataset(img).data
-            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.getcwd(),"cache/", "temp.nii"))
-            sitk_t1 = sitk.ReadImage(os.path.join(os.getcwd(),"cache/", "temp.nii"))
+            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.getcwd(),"cache", "temp.nii"))
+            sitk_t1 = sitk.ReadImage(os.path.join(os.getcwd(),"cache", "temp.nii"))
             self.img = sitk.GetArrayFromImage(sitk_t1)
         else:
             sitk_t1 = sitk.ReadImage(img)
