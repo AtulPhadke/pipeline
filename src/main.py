@@ -347,7 +347,6 @@ class Pipeline:
         print("\nHere's a preview...")
         self.qual = qualityChecker(self.chosen_file, nii=self.nii)
         self.s = self.qual.run()
-        print(self.s)
         print("Finished quality_checker.")
 
     def format_paragraph(self):
@@ -668,8 +667,8 @@ class qualityChecker:
 
         if not nii:
             self.img = Dataset(img).data
-            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.getcwd(),"cache", "temp.nii"))
-            sitk_t1 = sitk.ReadImage(os.path.join(os.getcwd(),"cache", "temp.nii"))
+            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.path.realpath(),"cache", "temp.nii"))
+            sitk_t1 = sitk.ReadImage(os.path.join(os.path.realpath(),"cache", "temp.nii"))
             self.img = sitk.GetArrayFromImage(sitk_t1)
         else:
             sitk_t1 = sitk.ReadImage(img)
@@ -757,7 +756,7 @@ class qualityChecker:
                 self.img1.set_data(self.img[self.DIRECTION,self.CURRENT1, :, :])
                 self.img2.set_data(self.img[self.DIRECTION,:,:,self.CURRENT2])
                 self.f.suptitle("B"+str(self.DIRECTION)+" Image", fontsize=15, fontweight="bold")
-                print(self.directions["b"+str(self.DIRECTION)])
+                #print(self.directions["b"+str(self.DIRECTION)])
                 if self.directions["b"+str(self.DIRECTION)] and not self.check.lines[0][0].get_visible():
                     self.check.set_active(0)
 
@@ -796,7 +795,7 @@ class qualityChecker:
             plt.close()
 
     def func(self,label):
-        print(self.check.lines[0][0].get_visible())
+        #print(self.check.lines[0][0].get_visible())
         if self.check.lines[0][0].get_visible():
             self.directions["b"+str(self.DIRECTION)] = True
         else:
