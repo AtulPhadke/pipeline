@@ -468,9 +468,14 @@ class Pipeline:
 
     def run_pipeline(self):
         if self.process["Conversion"]:
-            img = self.bruker2nifti()
+            img, hdr = self.bruker2nifti()
+
+            header = nib.Nifti1Header()
+            header.set_data_shape(hdr.shape)
+            header.set_zooms(hdr.resolution)
+
             path = os.path.join(self.OUTPUT_DIR, (self.new_name+"_OG.nii"))
-            nib.save(img, path)
+            nib.save(img, path, header)
             self.img = nib.load(path)
             if self.process["Spliting"]:
                 self.splitImage()
@@ -481,18 +486,18 @@ class Pipeline:
                     tenfit = diff.dti_fit(self.img)
                     #b0 = nib.Nifti1Image(tenfit.evals, None).get_fdata()[:,:,:,0]
                     b0 = img.get_fdata()[:,:,:,0]
-                    save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")), b0, None)
+                    save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")))
                     if self.FA:
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), tenfit.fa, None)
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")))
                     if self.ADC:
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_adc.nii")), tenfit.md, None)
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_adc.nii")))
                     if self.LAMBDA:
                         l1, l2, l3 = dti._roll_evals(tenfit.evals, -1)
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l1.nii")), l1, None)
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l2.nii")), l2, None)
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l3.nii")), l3, None)
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l1.nii")))
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l2.nii")))
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l3.nii")))
                     if self.RD:
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")), tenfit.rd, None)
+                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")))
 
 
                 print("\nFinished.")
@@ -507,7 +512,7 @@ class Pipeline:
     ## CONVERSION SOFTWARE
     def bruker2nifti(self):
         dataset = Dataset(self.chosen_file)
-        return nib.Nifti1Image(dataset.data, None)
+        return nib.Nifti1Image(dataset.data, None), dataset
 
     ##SPLITING SOFTWARE
     def splitImage(self):
