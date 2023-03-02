@@ -471,8 +471,8 @@ class Pipeline:
             img, hdr = self.bruker2nifti()
 
             header = nib.Nifti1Header()
-            header.set_data_shape(hdr.shape)
-            header.set_zooms(hdr.resolution)
+            #header.set_data_shape(hdr.shape[0:2])
+            header["pixdim"] = hdr.resolution
 
             path = os.path.join(self.OUTPUT_DIR, (self.new_name+"_OG.nii"))
             nib.save(img, path)
@@ -486,18 +486,20 @@ class Pipeline:
                     tenfit = diff.dti_fit(self.img)
                     #b0 = nib.Nifti1Image(tenfit.evals, None).get_fdata()[:,:,:,0]
                     b0 = img.get_fdata()[:,:,:,0]
-                    save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")))
+                    save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")),nib.Nifti1Image(b0, None, header).get_fdata(), None)
                     if self.FA:
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")))
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), nib.Nifti1Image(tenfit.fa, None, header).get_fdata(), None
                     if self.ADC:
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_adc.nii")))
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_adc.nii")),nib.Nifti1Image(tenfit.adc, None, header).get_fdata(), None)
                     if self.LAMBDA:
                         l1, l2, l3 = dti._roll_evals(tenfit.evals, -1)
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l1.nii")))
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l2.nii")))
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_l3.nii")))
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l1.nii")), nib.Nifti1Image(l1, None, header).get_fdata(), None)
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l2.nii")), nib.Nifti1Image(l2, None, header).get_fdata(), None)
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l3.nii")), nib.Nifti1Image(l3, None, header).get_fdata(), None)
+                        
                     if self.RD:
-                        save_nifti(nib.Nifti1Image(b0, None, header), os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")))
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")), nib.Nifti1Image(tenfit.rd, None, header).get_fdata(), None)
+                        #save_nifti(nib.Nifti1Image(b0, None, header).get_fdata(), os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")))
 
 
                 print("\nFinished.")
