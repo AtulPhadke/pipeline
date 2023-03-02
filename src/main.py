@@ -106,6 +106,7 @@ class Pipeline:
         self.LAMBDA = False
         self.FA = False
         self.ADC = False
+        self.RD = False
 
     def __parse_file(self, directory):
         choosing_file = True
@@ -289,6 +290,10 @@ class Pipeline:
                             self.LAMBDA = self.ynpress()
                         print("\n")
                         time.sleep(0.1)
+                        with Waiting_Spinner(delay=0.15, askingText="Would you like RD file?"):
+                            self.RD = self.ynpress()
+                        print("\n")
+                        time.sleep(0.1)
 
 
     def askForSplitAxis(self):
@@ -465,7 +470,7 @@ class Pipeline:
     def run_pipeline(self):
         if self.process["Conversion"]:
             img = self.bruker2nifti()
-            path = os.path.join(self.OUTPUT_DIR, (self.new_name+"OG.nii"))
+            path = os.path.join(self.OUTPUT_DIR, (self.new_name+"_OG.nii"))
             nib.save(img, path)
             self.img = nib.load(path)
             if self.process["Spliting"]:
@@ -486,6 +491,8 @@ class Pipeline:
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l1.nii")), l1, None)
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l2.nii")), l2, None)
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_l3.nii")), l3, None)
+                    if self.RD:
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_rd.nii")), tenfit.rd, None)
 
 
                 print("\nFinished.")
@@ -716,6 +723,8 @@ class qualityChecker:
         for b in self.b_images:
             self.directions[str(b)] = True
 
+        self.ax_check.set_visible(False)
+
         self.check = CheckButtons(self.ax_check, ["Keep Direction"], [True])
         self.check.on_clicked(self.func)
 
@@ -755,6 +764,11 @@ class qualityChecker:
                 if not self.directions["b"+str(self.DIRECTION)] and self.check.lines[0][0].get_visible():
                     self.check.set_active(0)
 
+                if self.DIRECTION != 0:
+                    self.ax_check.set_visible(True)
+                else:
+                    self.ax_check.set_visible(False)
+
                 self.f.canvas.draw_idle()
 
         elif event.inaxes == self.axprev:
@@ -764,12 +778,19 @@ class qualityChecker:
                 self.img1.set_data(self.img[self.DIRECTION,self.CURRENT1, :, :])
                 self.img2.set_data(self.img[self.DIRECTION,:,:,self.CURRENT2])
                 self.f.suptitle("B"+str(self.DIRECTION)+" Image", fontsize=15, fontweight="bold")
-                self.f.canvas.draw_idle()
+                
                 if self.directions["b"+str(self.DIRECTION)] and not self.check.lines[0][0].get_visible():
                     self.check.set_active(0)
 
                 if not self.directions["b"+str(self.DIRECTION)] and self.check.lines[0][0].get_visible():
                     self.check.set_active(0)
+
+                if self.DIRECTION != 0:
+                    self.ax_check.set_visible(True)
+                else:
+                    self.ax_check.set_visible(False)
+
+                self.f.canvas.draw_idle()
 
         elif event.inaxes == self.axfinish:
             plt.close()
