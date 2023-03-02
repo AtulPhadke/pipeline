@@ -488,7 +488,7 @@ class Pipeline:
                     b0 = img.get_fdata()[:,:,:,0]
                     save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")),nib.Nifti1Image(b0, None, header).get_fdata(), None)
                     if self.FA:
-                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), nib.Nifti1Image(tenfit.fa, None, header).get_fdata(), None
+                        save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), nib.Nifti1Image(tenfit.fa, None, header).get_fdata(), None)
                     if self.ADC:
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_adc.nii")),nib.Nifti1Image(tenfit.adc, None, header).get_fdata(), None)
                     if self.LAMBDA:
