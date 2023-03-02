@@ -479,7 +479,8 @@ class Pipeline:
                     diff = DTI(self.chosen_file, self.new_name, self.OUTPUT_DIR, directions=self.s)
                     diff.generate_bvals()
                     tenfit = diff.dti_fit(self.img)
-                    b0 = nib.Nifti1Image(tenfit.evals, None).get_fdata()[:,:,:,0]
+                    #b0 = nib.Nifti1Image(tenfit.evals, None).get_fdata()[:,:,:,0]
+                    b0 = img[:,:,:,0]
                     save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")), b0, None)
                     if self.FA:
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), tenfit.fa, None)
@@ -667,8 +668,8 @@ class qualityChecker:
 
         if not nii:
             self.img = Dataset(img).data
-            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.path.realpath(),"cache", "temp.nii"))
-            sitk_t1 = sitk.ReadImage(os.path.join(os.path.realpath(),"cache", "temp.nii"))
+            nib.save(nib.Nifti1Image(self.img, None), os.path.join(os.getcwd(),"cache", "temp.nii"))
+            sitk_t1 = sitk.ReadImage(os.path.join(os.getcwd(),"cache", "temp.nii"))
             self.img = sitk.GetArrayFromImage(sitk_t1)
         else:
             sitk_t1 = sitk.ReadImage(img)
