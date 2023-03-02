@@ -480,7 +480,7 @@ class Pipeline:
                     diff.generate_bvals()
                     tenfit = diff.dti_fit(self.img)
                     #b0 = nib.Nifti1Image(tenfit.evals, None).get_fdata()[:,:,:,0]
-                    b0 = img[:,:,:,0]
+                    b0 = img.get_fdata()[:,:,:,0]
                     save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_b0.nii")), b0, None)
                     if self.FA:
                         save_nifti(os.path.join(self.OUTPUT_DIR, (self.new_name+"_fa.nii")), tenfit.fa, None)
