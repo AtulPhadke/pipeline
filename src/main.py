@@ -475,7 +475,7 @@ class Pipeline:
             header.set_zooms(hdr.resolution)
 
             path = os.path.join(self.OUTPUT_DIR, (self.new_name+"_OG.nii"))
-            nib.save(img, path, header)
+            nib.save(img, path)
             self.img = nib.load(path)
             if self.process["Spliting"]:
                 self.splitImage()
